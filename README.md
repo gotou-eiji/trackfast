@@ -22,6 +22,7 @@ trackfast/
 - Docker + Docker Compose
 - Node.js 20+
 - Python 3.11+
+- (Opcional) Firebase project para push notifications reais
 
 ## Rodando localmente
 
