@@ -1,0 +1,106 @@
+version: '3.9'
+
+services:
+  # ── Infraestrutura ──────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: trackfast
+      POSTGRES_PASSWORD: trackfast123
+      POSTGRES_DB: trackfast
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on: [zookeeper]
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "9092:9092"
+
+  # ── Serviços ────────────────────────────────────────────────
+  tracking-service:
+    build: ./tracking-service
+    ports:
+      - "3001:3001"
+    environment:
+      REDIS_URL: redis://redis:6379
+      KAFKA_BROKER: kafka:9092
+      PORT: 3001
+    depends_on: [redis, kafka]
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "3002:3002"
+    environment:
+      DATABASE_URL: postgresql://trackfast:trackfast123@postgres:5432/trackfast
+      KAFKA_BROKER: kafka:9092
+      PORT: 3002
+    depends_on: [postgres, kafka]
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "3003:3003"
+    environment:
+      KAFKA_BROKER: kafka:9092
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY}
+      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL}
+      PORT: 3003
+    depends_on: [kafka]
+
+  prediction-service:
+    build: ./prediction-service
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://trackfast:trackfast123@postgres:5432/trackfast
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      JWT_SECRET: supersecret_troque_em_producao
+      TRACKING_SERVICE_URL: http://tracking-service:3001
+      ORDER_SERVICE_URL: http://order-service:3002
+      NOTIFICATION_SERVICE_URL: http://notification-service:3003
+      PREDICTION_SERVICE_URL: http://prediction-service:8000
+      PORT: 3000
+    depends_on:
+      - tracking-service
+      - order-service
+      - notification-service
+      - prediction-service
+
+  frontend-web:
+    build: ./frontend-web
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3000
+      VITE_WS_URL: ws://localhost:3001
+
+volumes:
+  postgres_data:
