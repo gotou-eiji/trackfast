@@ -22,7 +22,6 @@ trackfast/
 - Docker + Docker Compose
 - Node.js 20+
 - Python 3.11+
-- (Opcional) Firebase project para push notifications reais
 
 ## Rodando localmente
 
@@ -30,7 +29,7 @@ trackfast/
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/trackfast.git
+git clone https://github.com/gotou-eiji/trackfast
 cd trackfast
 
 # Copie o arquivo de variáveis de ambiente
