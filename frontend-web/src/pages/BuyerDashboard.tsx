@@ -1,79 +1,85 @@
 // frontend-web/src/pages/BuyerDashboard.tsx
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+import { MOCK_ORDERS, Order } from '../mockData'
 
 const STATUS_LABELS: Record<string, string> = {
   pending:    '⏳ Aguardando coleta',
   collected:  '📦 Coletado',
   in_transit: '🚚 Em trânsito',
-  nearby:     '📍 Próximo',
+  nearby:     '📍 Entregador próximo!',
   delivered:  '✅ Entregue',
-  failed:     '⚠️ Falhou',
+  failed:     '⚠️ Tentativa falhou',
 }
 
-interface Order {
-  id: string
-  product_name: string
-  status: string
-  dest_address: string
-  eta_from?: string
-  eta_to?: string
-  created_at: string
+const STATUS_COLOR: Record<string, string> = {
+  pending:    '#f59e0b',
+  collected:  '#3b82f6',
+  in_transit: '#2563eb',
+  nearby:     '#7c3aed',
+  delivered:  '#16a34a',
+  failed:     '#dc2626',
 }
 
 interface Props { token: string; onLogout: () => void }
 
-export default function BuyerDashboard({ token, onLogout }: Props) {
-  const [orders, setOrders] = useState<Order[]>([])
+export default function BuyerDashboard({ onLogout }: Props) {
   const navigate = useNavigate()
-
-  useEffect(() => {
-    fetch(`${API_URL}/api/orders/buyer/user-123`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(r => r.json())
-      .then(data => Array.isArray(data) ? setOrders(data) : setOrders([]))
-  }, [token])
+  const orders = MOCK_ORDERS
 
   const formatETA = (order: Order) => {
-    if (!order.eta_from || !order.eta_to) return '—'
     const f = new Date(order.eta_from).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
     const t = new Date(order.eta_to).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    return `${f} – ${t}`
+    const conf = Math.round(order.eta_confidence * 100)
+    return `${f} – ${t} (confiança ${conf}%)`
   }
 
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h2 style={styles.title}>[ TF ] Meus Pedidos</h2>
+        <div>
+          <h2 style={styles.title}>[ TF ] TrackFast</h2>
+          <p style={styles.sub}>Painel do Comprador</p>
+        </div>
         <button style={styles.logout} onClick={onLogout}>Sair</button>
       </header>
-
-      {orders.length === 0 && (
-        <p style={{ color: '#6b7280', textAlign: 'center', marginTop: 40 }}>
-          Nenhum pedido encontrado.
-        </p>
-      )}
 
       <div style={styles.list}>
         {orders.map(order => (
           <div key={order.id} style={styles.card}>
             <div style={styles.cardHeader}>
               <strong style={styles.productName}>{order.product_name}</strong>
-              <span style={styles.badge}>{STATUS_LABELS[order.status] || order.status}</span>
+              <span style={{
+                ...styles.badge,
+                background: STATUS_COLOR[order.status] + '20',
+                color: STATUS_COLOR[order.status],
+                border: `1px solid ${STATUS_COLOR[order.status]}40`
+              }}>
+                {STATUS_LABELS[order.status]}
+              </span>
             </div>
+
             <p style={styles.address}>📍 {order.dest_address}</p>
-            {order.eta_from && (
-              <p style={styles.eta}>⏱ Previsão: <strong>{formatETA(order)}</strong></p>
+
+            {order.status !== 'delivered' && (
+              <p style={styles.eta}>
+                ⏱ Previsão de entrega: <strong>{formatETA(order)}</strong>
+              </p>
             )}
-            <button
-              style={styles.trackBtn}
-              onClick={() => navigate(`/track/${order.id}`)}
-            >
-              Rastrear em tempo real →
-            </button>
+
+            {order.status === 'delivered' && (
+              <p style={{ ...styles.eta, color: '#16a34a' }}>
+                ✅ Entregue com sucesso!
+              </p>
+            )}
+
+            {order.status !== 'delivered' && (
+              <button
+                style={styles.trackBtn}
+                onClick={() => navigate(`/track/${order.id}`)}
+              >
+                🗺️ Rastrear em tempo real →
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -82,16 +88,17 @@ export default function BuyerDashboard({ token, onLogout }: Props) {
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  container: { maxWidth: 700, margin: '0 auto', padding: 20, fontFamily: 'sans-serif' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  title: { margin: 0, fontSize: 22, color: '#1A3C6E', fontFamily: 'monospace' },
-  logout: { background: 'none', border: '1px solid #d1d5db', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', color: '#6b7280' },
+  container: { maxWidth: 700, margin: '0 auto', padding: 20, fontFamily: 'sans-serif', background: '#f8fafc', minHeight: '100vh' },
+  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28, background: '#1A3C6E', borderRadius: 14, padding: '18px 24px' },
+  title: { margin: 0, fontSize: 22, color: '#fff', fontFamily: 'monospace' },
+  sub: { margin: '4px 0 0', color: '#93c5fd', fontSize: 13 },
+  logout: { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, padding: '7px 16px', cursor: 'pointer', color: '#fff', fontSize: 13 },
   list: { display: 'flex', flexDirection: 'column', gap: 16 },
-  card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 20 },
-  cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  card: { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: 22, boxShadow: '0 1px 6px rgba(0,0,0,0.05)' },
+  cardHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12, gap: 12, flexWrap: 'wrap' },
   productName: { fontSize: 16, color: '#111827' },
-  badge: { background: '#dbeafe', color: '#1e40af', padding: '3px 10px', borderRadius: 20, fontSize: 12 },
-  address: { margin: '4px 0', fontSize: 13, color: '#6b7280' },
-  eta: { margin: '4px 0', fontSize: 13, color: '#166534' },
-  trackBtn: { marginTop: 12, background: '#1A3C6E', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 18px', cursor: 'pointer', fontSize: 13 },
+  badge: { padding: '4px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' },
+  address: { margin: '0 0 8px', fontSize: 13, color: '#6b7280' },
+  eta: { margin: '0 0 14px', fontSize: 13, color: '#0369a1', background: '#f0f9ff', padding: '8px 12px', borderRadius: 8 },
+  trackBtn: { background: '#1A3C6E', color: '#fff', border: 'none', borderRadius: 9, padding: '10px 20px', cursor: 'pointer', fontSize: 13, fontWeight: 500 },
 }
