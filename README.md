@@ -151,3 +151,7 @@ Notification :3003    Prediction :8000
    ┌──────────┴────────────┐
 Redis (cache GPS)   PostgreSQL (dados)
 ```
+
+docker compose down
+docker compose build --no-cache frontend-web
+docker compose up
