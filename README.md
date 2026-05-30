@@ -155,3 +155,5 @@ Redis (cache GPS)   PostgreSQL (dados)
 docker compose down
 docker compose build --no-cache frontend-web
 docker compose up
+npm install
+npm run dev
