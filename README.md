@@ -152,8 +152,11 @@ Notification :3003    Prediction :8000
 Redis (cache GPS)   PostgreSQL (dados)
 ```
 
-docker compose down
-docker compose build --no-cache frontend-web
-docker compose up
-npm install
-npm run dev
+## Próximos passos
+
+- [ ] Implementar App Mobile do entregador (React Native)
+- [ ] Adicionar testes unitários com Jest e Pytest
+- [ ] Configurar Terraform para infra AWS
+- [ ] Integrar Google Maps API para rotas reais
+- [ ] Adicionar WhatsApp Business API
+- [ ] Implementar modelo ML real com scikit-learn
