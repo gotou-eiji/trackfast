@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900">
+  <defs>
+    <linearGradient id="bgd" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F0F4FA"/>
+      <stop offset="100%" style="stop-color:#E8EEF8"/>
+    </linearGradient>
+    <linearGradient id="stripe" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A3C6E;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#2E75B6;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="accentBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1A3C6E;stop-opacity:0.07"/>
+      <stop offset="100%" style="stop-color:#2E75B6;stop-opacity:0.02"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fundo geral off-white -->
+  <rect width="1440" height="900" fill="url(#bgd)"/>
+
+  <!-- Faixa lateral esquerda azul -->
+  <rect x="0" y="0" width="6" height="900" fill="url(#stripe)"/>
+
+  <!-- Header bar decorativo -->
+  <rect x="0" y="0" width="1440" height="64" fill="#1A3C6E" opacity="0.04"/>
+  <rect x="0" y="62" width="1440" height="2" fill="#1A3C6E" opacity="0.08"/>
+
+  <!-- Faixas horizontais suaves (linhas de grid) -->
+  <rect x="0" y="180" width="1440" height="1" fill="#1A3C6E" opacity="0.05"/>
+  <rect x="0" y="360" width="1440" height="1" fill="#1A3C6E" opacity="0.05"/>
+  <rect x="0" y="540" width="1440" height="1" fill="#1A3C6E" opacity="0.05"/>
+  <rect x="0" y="720" width="1440" height="1" fill="#1A3C6E" opacity="0.05"/>
+
+  <!-- Faixas verticais suaves -->
+  <rect x="360" y="64" width="1" height="836" fill="#1A3C6E" opacity="0.04"/>
+  <rect x="720" y="64" width="1" height="836" fill="#1A3C6E" opacity="0.04"/>
+  <rect x="1080" y="64" width="1" height="836" fill="#1A3C6E" opacity="0.04"/>
+
+  <!-- Cards decorativos (sombra de cards de métricas) -->
+  <rect x="32" y="90" width="300" height="80" rx="12" fill="#1A3C6E" opacity="0.04"/>
+  <rect x="352" y="90" width="300" height="80" rx="12" fill="#1A3C6E" opacity="0.04"/>
+  <rect x="672" y="90" width="300" height="80" rx="12" fill="#1A3C6E" opacity="0.04"/>
+  <rect x="992" y="90" width="300" height="80" rx="12" fill="#1A3C6E" opacity="0.04"/>
+
+  <!-- Barra de acento direita -->
+  <rect x="1200" y="64" width="240" height="836" fill="url(#accentBar)"/>
+
+  <!-- Ícone caminhão grande fundo direito -->
+  <g transform="translate(1150, 480)" opacity="0.05" fill="none" stroke="#1A3C6E" stroke-width="6" stroke-linejoin="round">
+    <rect x="0" y="20" width="140" height="90" rx="8"/>
+    <path d="M140 40 L190 40 L220 76 L220 110 L140 110 Z"/>
+    <circle cx="40" cy="116" r="20"/>
+    <circle cx="170" cy="116" r="20"/>
+    <line x1="140" y1="20" x2="140" y2="110"/>
+    <line x1="0" y1="60" x2="140" y2="60"/>
+  </g>
+
+  <!-- Ícone pin grande fundo esquerdo -->
+  <g transform="translate(60, 480)" opacity="0.05" fill="none" stroke="#2E75B6" stroke-width="5">
+    <path d="M60 0 C28 0 0 26 0 58 C0 100 60 150 60 150 C60 150 120 100 120 58 C120 26 92 0 60 0 Z"/>
+    <circle cx="60" cy="58" r="24"/>
+  </g>
+
+  <!-- Linha de rota decorativa -->
+  <g opacity="0.07" stroke="#1A3C6E" fill="none">
+    <path d="M0 750 Q200 700 400 730 Q600 760 800 720 Q1000 680 1200 710 Q1320 725 1440 700" stroke-width="2" stroke-dasharray="10 6"/>
+    <circle cx="400" cy="730" r="5" fill="#1A3C6E"/>
+    <circle cx="800" cy="720" r="5" fill="#1A3C6E"/>
+    <circle cx="1200" cy="710" r="5" fill="#1A3C6E"/>
+  </g>
+
+  <!-- Pontos decorativos grid canto inferior -->
+  <g opacity="0.12" fill="#2E75B6">
+    <circle cx="1320" cy="780" r="2.5"/><circle cx="1360" cy="780" r="2.5"/><circle cx="1400" cy="780" r="2.5"/>
+    <circle cx="1320" cy="820" r="2.5"/><circle cx="1360" cy="820" r="2.5"/><circle cx="1400" cy="820" r="2.5"/>
+    <circle cx="1320" cy="860" r="2.5"/><circle cx="1360" cy="860" r="2.5"/><circle cx="1400" cy="860" r="2.5"/>
+  </g>
+
+  <!-- Losangos decorativos -->
+  <g opacity="0.08" fill="none" stroke="#1A3C6E" stroke-width="2">
+    <rect x="700" y="820" width="18" height="18" transform="rotate(45 709 829)"/>
+    <rect x="1100" y="140" width="14" height="14" transform="rotate(45 1107 147)"/>
+    <rect x="240" y="800" width="12" height="12" transform="rotate(45 246 806)"/>
+  </g>
+</svg>

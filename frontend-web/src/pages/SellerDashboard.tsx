@@ -3,21 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { MOCK_ORDERS, Order } from '../mockData'
 
 const STATUS_LABELS: Record<string, string> = {
-  pending:    '⏳ Aguardando',
-  collected:  '📦 Coletado',
-  in_transit: '🚚 Em trânsito',
-  nearby:     '📍 Próximo',
-  delivered:  '✅ Entregue',
-  failed:     '⚠️ Falhou',
+  pending: '⏳ Aguardando', collected: '📦 Coletado',
+  in_transit: '🚚 Em trânsito', nearby: '📍 Próximo',
+  delivered: '✅ Entregue', failed: '⚠️ Falhou',
 }
-
 const STATUS_COLOR: Record<string, string> = {
-  pending:    '#f59e0b',
-  collected:  '#3b82f6',
-  in_transit: '#2563eb',
-  nearby:     '#7c3aed',
-  delivered:  '#16a34a',
-  failed:     '#dc2626',
+  pending: '#f59e0b', collected: '#3b82f6', in_transit: '#2563eb',
+  nearby: '#7c3aed', delivered: '#16a34a', failed: '#dc2626',
 }
 
 interface Props { token: string; onLogout: () => void }
@@ -25,7 +17,6 @@ interface Props { token: string; onLogout: () => void }
 export default function SellerDashboard({ onLogout }: Props) {
   const navigate = useNavigate()
   const orders = MOCK_ORDERS
-
   const total     = orders.length
   const delivered = orders.filter(o => o.status === 'delivered').length
   const inTransit = orders.filter(o => ['in_transit', 'nearby', 'collected'].includes(o.status)).length
@@ -39,91 +30,157 @@ export default function SellerDashboard({ onLogout }: Props) {
   }
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <div>
-          <h2 style={styles.title}>[ TF ] TrackFast</h2>
-          <p style={styles.sub}>Dashboard do Vendedor</p>
-        </div>
-        <button style={styles.logout} onClick={onLogout}>Sair</button>
-      </header>
+    <>
+      <style>{`
+        .seller-page {
+          min-height: 100vh;
+          background-image: url(/bg-dashboard.svg);
+          background-size: cover;
+          background-position: center;
+          background-attachment: fixed;
+          font-family: sans-serif;
+          padding: 16px;
+          box-sizing: border-box;
+        }
+        .seller-inner { max-width: 960px; margin: 0 auto; }
+        .seller-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: linear-gradient(135deg, #1A3C6E, #2E75B6);
+          border-radius: 16px;
+          padding: 18px 24px;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 20px rgba(26,60,110,0.2);
+        }
+        .seller-title { margin: 0; font-size: 20px; color: #fff; font-family: monospace; }
+        .seller-sub { margin: 4px 0 0; color: #93c5fd; font-size: 12px; }
+        .logout-btn2 {
+          background: rgba(255,255,255,0.15);
+          border: 1px solid rgba(255,255,255,0.3);
+          border-radius: 8px;
+          padding: 7px 16px;
+          cursor: pointer;
+          color: #fff;
+          font-size: 13px;
+        }
+        .metrics-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+          margin-bottom: 20px;
+        }
+        .metric-card {
+          background: rgba(255,255,255,0.95);
+          border-radius: 14px;
+          padding: 16px 18px;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 2px 10px rgba(26,60,110,0.06);
+        }
+        .metric-label { display: block; font-size: 11px; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric-value { font-size: 30px; font-weight: 700; }
+        .table-wrap {
+          background: rgba(255,255,255,0.95);
+          border-radius: 16px;
+          overflow: hidden;
+          border: 1px solid #e5e7eb;
+          box-shadow: 0 2px 12px rgba(26,60,110,0.07);
+        }
+        .orders-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .orders-table thead tr { background: linear-gradient(135deg, #1A3C6E, #2E75B6); }
+        .orders-table th { padding: 13px 16px; color: #fff; text-align: left; font-weight: 500; font-size: 13px; }
+        .orders-table td { padding: 12px 16px; border-bottom: 1px solid #f3f4f6; }
+        .orders-table tr:last-child td { border-bottom: none; }
+        .orders-table tr:nth-child(even) td { background: #f9fafb; }
+        .sbadge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+        .track-btn2 {
+          background: linear-gradient(135deg, #1A3C6E, #2E75B6);
+          color: #fff;
+          border: none;
+          border-radius: 7px;
+          padding: 6px 14px;
+          cursor: pointer;
+          font-size: 12px;
+          white-space: nowrap;
+        }
+        /* Mobile: esconde colunas menos importantes */
+        @media (max-width: 700px) {
+          .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+          .col-hide { display: none; }
+          .seller-header { padding: 14px 16px; }
+          .seller-title { font-size: 17px; }
+        }
+        @media (max-width: 420px) {
+          .metrics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+          .metric-value { font-size: 24px; }
+          .orders-table th, .orders-table td { padding: 10px 10px; font-size: 12px; }
+        }
+      `}</style>
 
-      {/* Métricas */}
-      <div style={styles.metrics}>
-        {[
-          { label: 'Total de Pedidos', value: total,          color: '#1A3C6E', bg: '#eff6ff' },
-          { label: 'Em Trânsito',      value: inTransit,      color: '#2563eb', bg: '#dbeafe' },
-          { label: 'Entregues',        value: delivered,       color: '#16a34a', bg: '#dcfce7' },
-          { label: 'Taxa no Prazo',    value: `${onTimeRate}%`,color: '#0891b2', bg: '#e0f2fe' },
-        ].map(m => (
-          <div key={m.label} style={{ ...styles.metric, background: m.bg }}>
-            <span style={styles.metricLabel}>{m.label}</span>
-            <span style={{ ...styles.metricValue, color: m.color }}>{m.value}</span>
-          </div>
-        ))}
-      </div>
+      <div className="seller-page">
+        <div className="seller-inner">
+          <header className="seller-header">
+            <div>
+              <h2 className="seller-title">[ TF ] TrackFast</h2>
+              <p className="seller-sub">Dashboard do Vendedor</p>
+            </div>
+            <button className="logout-btn2" onClick={onLogout}>Sair</button>
+          </header>
 
-      {/* Tabela de pedidos */}
-      <div style={styles.tableWrapper}>
-        <table style={styles.table}>
-          <thead>
-            <tr style={styles.thead}>
-              <th style={styles.th}>Produto</th>
-              <th style={styles.th}>Status</th>
-              <th style={styles.th}>Previsão</th>
-              <th style={styles.th}>Destino</th>
-              <th style={styles.th}>Ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order, i) => (
-              <tr key={order.id} style={{ background: i % 2 === 0 ? '#f9fafb' : '#fff' }}>
-                <td style={styles.td}><strong>{order.product_name}</strong></td>
-                <td style={styles.td}>
-                  <span style={{
-                    padding: '3px 10px', borderRadius: 20, fontSize: 12,
-                    background: STATUS_COLOR[order.status] + '20',
-                    color: STATUS_COLOR[order.status],
-                    border: `1px solid ${STATUS_COLOR[order.status]}40`
-                  }}>
-                    {STATUS_LABELS[order.status]}
-                  </span>
-                </td>
-                <td style={{ ...styles.td, fontSize: 12, color: '#0369a1' }}>{formatETA(order)}</td>
-                <td style={{ ...styles.td, fontSize: 12, color: '#6b7280' }}>{order.dest_address}</td>
-                <td style={styles.td}>
-                  {order.status !== 'delivered' && (
-                    <button
-                      style={styles.trackBtn}
-                      onClick={() => navigate(`/track/${order.id}`)}
-                    >
-                      Rastrear
-                    </button>
-                  )}
-                </td>
-              </tr>
+          <div className="metrics-grid">
+            {[
+              { label: 'Total de Pedidos', value: total,           color: '#1A3C6E' },
+              { label: 'Em Trânsito',      value: inTransit,       color: '#2563eb' },
+              { label: 'Entregues',         value: delivered,       color: '#16a34a' },
+              { label: 'Taxa no Prazo',     value: `${onTimeRate}%`,color: '#0891b2' },
+            ].map(m => (
+              <div key={m.label} className="metric-card">
+                <span className="metric-label">{m.label}</span>
+                <span className="metric-value" style={{ color: m.color }}>{m.value}</span>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
-}
+          </div>
 
-const styles: Record<string, React.CSSProperties> = {
-  container: { maxWidth: 960, margin: '0 auto', padding: 20, fontFamily: 'sans-serif', background: '#f8fafc', minHeight: '100vh' },
-  header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, background: '#1A3C6E', borderRadius: 14, padding: '18px 24px' },
-  title: { margin: 0, fontSize: 22, color: '#fff', fontFamily: 'monospace' },
-  sub: { margin: '4px 0 0', color: '#93c5fd', fontSize: 13 },
-  logout: { background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 8, padding: '7px 16px', cursor: 'pointer', color: '#fff', fontSize: 13 },
-  metrics: { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 },
-  metric: { borderRadius: 12, padding: '16px 20px', border: '1px solid #e5e7eb' },
-  metricLabel: { display: 'block', fontSize: 12, color: '#6b7280', marginBottom: 8 },
-  metricValue: { fontSize: 32, fontWeight: 700 },
-  tableWrapper: { background: '#fff', borderRadius: 14, overflow: 'hidden', border: '1px solid #e5e7eb' },
-  table: { width: '100%', borderCollapse: 'collapse', fontSize: 14 },
-  thead: { background: '#1A3C6E' },
-  th: { padding: '12px 16px', color: '#fff', textAlign: 'left', fontWeight: 500, fontSize: 13 },
-  td: { padding: '12px 16px', borderBottom: '1px solid #f3f4f6' },
-  trackBtn: { background: '#1A3C6E', color: '#fff', border: 'none', borderRadius: 7, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
+          <div className="table-wrap">
+            <table className="orders-table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>Status</th>
+                  <th className="col-hide">Previsão</th>
+                  <th className="col-hide">Destino</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map(order => (
+                  <tr key={order.id}>
+                    <td><strong>{order.product_name}</strong></td>
+                    <td>
+                      <span className="sbadge" style={{
+                        background: STATUS_COLOR[order.status] + '18',
+                        color: STATUS_COLOR[order.status],
+                        border: `1px solid ${STATUS_COLOR[order.status]}40`,
+                      }}>
+                        {STATUS_LABELS[order.status]}
+                      </span>
+                    </td>
+                    <td className="col-hide" style={{ fontSize: 12, color: '#0369a1' }}>{formatETA(order)}</td>
+                    <td className="col-hide" style={{ fontSize: 12, color: '#6b7280' }}>{order.dest_address}</td>
+                    <td>
+                      {order.status !== 'delivered' && (
+                        <button className="track-btn2" onClick={() => navigate(`/track/${order.id}`)}>
+                          Rastrear
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </>
+  )
 }

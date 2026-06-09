@@ -4,9 +4,7 @@ import { AuthState } from '../App'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
-interface Props {
-  onLogin: (auth: AuthState) => void
-}
+interface Props { onLogin: (auth: AuthState) => void }
 
 export default function LoginPage({ onLogin }: Props) {
   const [email, setEmail] = useState('')
@@ -35,59 +33,152 @@ export default function LoginPage({ onLogin }: Props) {
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.logo}>[ TF ] TrackFast</h1>
-        <p style={styles.subtitle}>Rastreamento logístico em tempo real</p>
+    <>
+      <style>{`
+        .login-container {
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background-image: url(/bg-login.svg);
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          padding: 16px;
+          box-sizing: border-box;
+        }
+        .login-card {
+          background: rgba(255, 255, 255, 0.94);
+          backdrop-filter: blur(10px);
+          border-radius: 18px;
+          padding: 40px;
+          width: 100%;
+          max-width: 400px;
+          box-shadow: 0 8px 48px rgba(26, 60, 110, 0.18);
+          border: 1px solid rgba(46, 117, 182, 0.12);
+          box-sizing: border-box;
+        }
+        .login-logo {
+          margin: 0 0 4px;
+          font-size: 26px;
+          color: #1A3C6E;
+          font-family: monospace;
+          letter-spacing: 1px;
+        }
+        .login-sub {
+          margin: 0 0 28px;
+          color: #64748b;
+          font-size: 13px;
+        }
+        .login-divider {
+          height: 2px;
+          background: linear-gradient(to right, #1A3C6E, #2E75B6);
+          border-radius: 2px;
+          margin-bottom: 24px;
+          opacity: 0.15;
+        }
+        .login-field { margin-bottom: 16px; }
+        .login-label {
+          display: block;
+          margin-bottom: 6px;
+          font-size: 13px;
+          color: #374151;
+          font-weight: 500;
+        }
+        .login-input {
+          width: 100%;
+          padding: 11px 14px;
+          border-radius: 9px;
+          border: 1.5px solid #d1d5db;
+          font-size: 14px;
+          box-sizing: border-box;
+          transition: border-color 0.2s;
+          background: #fafbfc;
+          outline: none;
+        }
+        .login-input:focus { border-color: #2E75B6; background: #fff; }
+        .login-error {
+          color: #ef4444;
+          font-size: 13px;
+          margin-bottom: 12px;
+          background: #fef2f2;
+          padding: 8px 12px;
+          border-radius: 8px;
+          border: 1px solid #fecaca;
+        }
+        .login-btn {
+          width: 100%;
+          padding: 13px;
+          background: linear-gradient(135deg, #1A3C6E, #2E75B6);
+          color: #fff;
+          border: none;
+          border-radius: 10px;
+          font-size: 15px;
+          cursor: pointer;
+          font-weight: 600;
+          letter-spacing: 0.3px;
+          transition: opacity 0.2s;
+        }
+        .login-btn:hover { opacity: 0.92; }
+        .login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-footer {
+          margin-top: 20px;
+          text-align: center;
+          font-size: 11px;
+          color: #9ca3af;
+        }
+        @media (max-width: 480px) {
+          .login-card { padding: 28px 20px; border-radius: 14px; }
+          .login-logo { font-size: 22px; }
+        }
+      `}</style>
 
-        <div style={styles.field}>
-          <label style={styles.label}>E-mail</label>
-          <input
-            style={styles.input}
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="seu@email.com"
-          />
+      <div className="login-container">
+        <div className="login-card">
+          <h1 className="login-logo">[ TF ] TrackFast</h1>
+          <p className="login-sub">Rastreamento logístico em tempo real</p>
+          <div className="login-divider" />
+
+          <div className="login-field">
+            <label className="login-label">E-mail</label>
+            <input
+              className="login-input"
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="seu@email.com"
+            />
+          </div>
+
+          <div className="login-field">
+            <label className="login-label">Senha</label>
+            <input
+              className="login-input"
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+            />
+          </div>
+
+          <div className="login-field">
+            <label className="login-label">Perfil</label>
+            <select className="login-input" value={role} onChange={e => setRole(e.target.value as any)}>
+              <option value="buyer">🛍️ Comprador</option>
+              <option value="seller">🏪 Vendedor</option>
+            </select>
+          </div>
+
+          {error && <p className="login-error">{error}</p>}
+
+          <button className="login-btn" onClick={handleSubmit} disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
+          </button>
+
+          <p className="login-footer">TrackFast MVP · Maringá, PR</p>
         </div>
-
-        <div style={styles.field}>
-          <label style={styles.label}>Senha</label>
-          <input
-            style={styles.input}
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="••••••••"
-          />
-        </div>
-
-        <div style={styles.field}>
-          <label style={styles.label}>Perfil</label>
-          <select style={styles.input} value={role} onChange={e => setRole(e.target.value as any)}>
-            <option value="buyer">Comprador</option>
-            <option value="seller">Vendedor</option>
-          </select>
-        </div>
-
-        {error && <p style={styles.error}>{error}</p>}
-
-        <button style={styles.button} onClick={handleSubmit} disabled={loading}>
-          {loading ? 'Entrando...' : 'Entrar'}
-        </button>
       </div>
-    </div>
+    </>
   )
-}
-
-const styles: Record<string, React.CSSProperties> = {
-  container: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' },
-  card: { background: '#fff', borderRadius: 16, padding: 40, width: 380, boxShadow: '0 4px 24px rgba(0,0,0,0.08)' },
-  logo: { margin: '0 0 4px', fontSize: 24, color: '#1A3C6E', fontFamily: 'monospace' },
-  subtitle: { margin: '0 0 28px', color: '#64748b', fontSize: 14 },
-  field: { marginBottom: 16 },
-  label: { display: 'block', marginBottom: 6, fontSize: 13, color: '#374151', fontWeight: 500 },
-  input: { width: '100%', padding: '10px 12px', borderRadius: 8, border: '1px solid #d1d5db', fontSize: 14, boxSizing: 'border-box' },
-  error: { color: '#ef4444', fontSize: 13, marginBottom: 12 },
-  button: { width: '100%', padding: '12px', background: '#1A3C6E', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, cursor: 'pointer', fontWeight: 600 },
 }
